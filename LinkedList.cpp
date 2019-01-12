@@ -5,89 +5,130 @@
 
 #include<iostream>
 
-template<typename T>
+using namespace std;
+
+//List ADT class definition
 class List
 {
-		struct node
+	private:
+		struct Node
 		{
-			T data;
-			node *next;
+			int data;
+			Node *next;
 		};
-		node *head, *tail;
-		size_t size_;
+		Node *head;
 	public:
-		List();
-		List(size_t _size);
-		void insert(T value);
-		T& operator[](size_t index);
-		size_t size();
+		List() : head(nullptr){}
+		void insertLL(int value);
+		void deleteLL(int value);
+		bool searchLL(int value);
+		void printLL();
 };
 
-//Creates empty list
-template<typename T>
-List<T>::List() : head(nullptr), tail(nullptr), size_(0){}
-
-//Creates list of size _size and initialize every element with 0
-template<typename T>
-List<T>::List(size_t _size) : head(nullptr), tail(nullptr), size_(0)
-{
-	while(size_ != _size)
-		insert(0);
-}
-
 //Inserts an element at back of the list
-template<typename T>
-void List<T>::insert(T value)
+void List::insertLL(int value)
 {
-	size_++;
-	node *newNode = new node;
+	Node *newNode = new Node;
 	newNode->data = value;
 	newNode->next = nullptr;
 	if(head == nullptr)
-		head = tail = newNode;				
+		head = newNode;				
 	else
 	{
-		tail->next = newNode;
-		tail = tail->next;
+		Node *ptr = head;
+		while(ptr->next != nullptr)
+			ptr = ptr->next;
+		ptr->next = newNode;
 	}	
 }
 
-//Returns value at passed index and returns value at last of the list if index is out of range
-template<typename T>
-T& List<T>::operator[](size_t index)
+//Deletes a value from the list, if present.
+void List::deleteLL(int value)
 {
-	size_t count = 0;
-	node *ptr = head;
-	//Iterate till count becomes equal to index or count < size of the list
-	while(count != index && count < size_)
+	Node *pre = nullptr;
+	Node *cur = head;
+	
+	while(cur != nullptr && cur->data != value)
 	{
-		ptr = ptr->next;
-		count++;
+		pre = cur;
+		cur = cur->next;
 	}
-	return count < size_ ? ptr->data : tail->data;
+	
+	if(cur == nullptr)//If value not found in list
+	{
+		cout<<value<<" not found in the list"<<endl;
+		return;
+	}
+	
+	if(cur == head)//If value is first in the list
+		head = head->next;
+	else
+		pre->next = cur->next;
+	delete cur;//Free memory allocated for the node
 }
 
-//Returns size of the list
-template<typename T>
-size_t List<T>::size()
+//Searchs for a value in the list and if found returns true otherwise false
+bool List::searchLL(int value)
 {
-	return size_;
+	Node *ptr = head;
+	while(ptr != nullptr && ptr->data != value)
+		ptr = ptr->next;
+	
+	if(ptr == nullptr)//If value not found in the list
+		return false;
+	
+	return true;
 }
 
-//Driver function
+//Prints content of list
+void List::printLL()
+{
+	Node *ptr = head;
+	while(ptr != nullptr)
+	{
+		if(ptr->next == nullptr)
+			cout<<ptr->data<<endl;
+		else
+			cout<<ptr->data<<" -> ";
+		ptr = ptr->next;
+	}
+}
+
+//Driver function to test above list
 int main()
 {
-	List<int> l;
-	List<float> ll(10);
-	l.insert(1);
-	l.insert(2);
-	l.insert(3);
-	l.insert(4);
-	std::cout<<l[-1]<<std::endl;
-	std::cout<<"Size l = "<<l.size()<<std::endl;
-	std::cout<<"Size ll = "<<ll.size()<<std::endl;
-	ll[5] = 1.2f;
-	ll[5]++;
-	std::cout<<ll[5]<<std::endl;
+	List l;
+	l.insertLL(1);
+	l.insertLL(2);
+	l.insertLL(3);
+	l.insertLL(4);
+	l.insertLL(5);
+	l.insertLL(6);
+	l.insertLL(7);
+	l.insertLL(8);
+	l.insertLL(9);
+	l.insertLL(10);
+	
+	cout<<"List after inserting 1, 2, 3, 4, 5, 6, 7, 8, 9 and 10: ";
+	l.printLL();
+	
+	l.deleteLL(1);
+	l.deleteLL(6);
+	l.deleteLL(10);
+	
+	cout<<"\nList after deleting 1, 6 and 10: ";
+	l.printLL();
+	cout<<"\nTrying to delete 10 again: ";
+	l.deleteLL(10);
+	
+	if(l.searchLL(5))
+		cout<<"\n5 is present in the list"<<endl;
+	else
+		cout<<"\n5 is NOT present in the list"<<endl;
+	
+	if(l.searchLL(10))
+		cout<<"\n10 is present in the list"<<endl;
+	else
+		cout<<"\n10 is NOT present in the list"<<endl;
 	return 0;
 }
